@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Filament\Panel;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -56,6 +59,12 @@ class User extends Authenticatable
         'usuario'     => 'Usuario',
        //  Add any other roles you have in your application
     ];
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return str_ends_with($this->email, '@gmail.com') && $this->hasVerifiedEmail();
+    }
+
     public function producciones()
     {
         return $this->hasMany(ProduccionDiaria::class, 'usuario_id');
